@@ -22,7 +22,7 @@ namespace Lab1
     {
         public MainWindow()
         {
-            InitializeComponent();
+            //InitializeComponent();
         }
     }
 }

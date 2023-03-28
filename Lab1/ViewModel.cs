@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Security.Cryptography;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -12,7 +13,7 @@ using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using SkiaSharp;
 
-namespace Lab1;
+namespace Lab3;
 
 [ObservableObject]
 public partial class ViewModel
@@ -21,9 +22,12 @@ public partial class ViewModel
 
     private readonly ObservableCollection<ObservableValue> _series1Values;
     private readonly ObservableCollection<ObservableValue> _series2Values;
-    private int count = 10;
+    public double[,] _tableData { get; set; }
+
+    private int count = 1000;
+
     public ObservableCollection<ISeries> Series { get; set; }
-    public ObservableCollection<ISeries> Series2 { get; set; }
+
     [ObservableProperty]
     private string _series2Val;
     public string Series2Values
@@ -32,14 +36,14 @@ public partial class ViewModel
         set => SetProperty(ref _series2Val, value);
     }
 
-
-
     public ViewModel()
     {
+        _tableData = rndVal.Table;
+
         // Use ObservableCollections to let the chart listen for changes (or any INotifyCollectionChanged). 
         _series1Values = new ObservableCollection<ObservableValue>();
 
-        foreach (var value in rndVal.countArray)
+        foreach (var value in rndVal.TableSecondCol)
             _series1Values.Add(new ObservableValue(value));
 
         Series = new ObservableCollection<ISeries>
@@ -57,22 +61,15 @@ public partial class ViewModel
         foreach (var value in rndVal.statistics)
             _series2Values.Add(new ObservableValue(value));
 
-        Series2 = new ObservableCollection<ISeries>
-        {
-             new PieSeries<ObservableValue> { Values = new List<ObservableValue> { _series2Values[0] }, Pushout = 4, Name = "Expected value" },
-             new PieSeries<ObservableValue> { Values = new List<ObservableValue> { _series2Values[2] }, Pushout = 4, Name = "Standard deviation" },
-             new PieSeries<ObservableValue> { Values = new List<ObservableValue> { _series2Values[3] }, Pushout = 4, Name = "Log" },
-         };
-
-        UpdateSeries2Values();
+        Series2Values = $"N: {count} | Expected value: {_series2Values[0].Value:F2} | Mean: " +
+            $"{_series2Values[1].Value:F2}";
     }
-
 
     public Axis[] XAxes { get; set; } =
     {
         new Axis
         {
-            Labels = new string[] { "1", "2", "3","4", "5","6" },
+            Labels = RandValuesStatisticCalculator.Labels,
             LabelsPaint = new SolidColorPaint(new SKColor(255, 255, 255)),
             LabelsRotation = 0,
             SeparatorsAtCenter = false,
@@ -81,49 +78,5 @@ public partial class ViewModel
     };
 
 
-    [ICommand]
-    public void AddItem()
-    {
-        if (count < 10000)
-        {
-            count *= 10;
-            UpdateItem();
-        }
-    }
 
-    [ICommand]
-    public void RemoveItem()
-    {
-        if (count > 10)
-        {
-            count /= 10;
-            UpdateItem();
-        }
-    }
-
-    [ICommand]
-    public void UpdateItem()
-    {
-        ObservableValue currentInstance;
-
-        rndVal.AddRandValues(count);
-        for (int i = 0; i < rndVal.countArray.Length; i++)
-        {
-            currentInstance = _series1Values[i];
-            currentInstance.Value = rndVal.countArray[i];
-        }
-
-        rndVal.CalculateStatistics(count);
-        for (int i = 0; i < rndVal.statistics.Length; i++)
-        {
-            currentInstance = _series2Values[i];
-            currentInstance.Value = rndVal.statistics[i];
-            UpdateSeries2Values();
-        }
-    }
-    private void UpdateSeries2Values()
-    {
-            Series2Values = $"N: {count} | Expected value: {_series2Values[0].Value:F2} | Mean: " +
-            $"{_series2Values[1].Value:F2}\nStandard deviation: {_series2Values[2].Value:F2} | Log: {_series2Values[3].Value:F2}";
-    }
 }

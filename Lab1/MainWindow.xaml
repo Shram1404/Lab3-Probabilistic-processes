@@ -4,13 +4,26 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
-        xmlns:vms="clr-namespace:Lab1"
+        xmlns:vms="clr-namespace:Lab3"
+        xmlns:dataGrid2D="http://gu.se/DataGrid2D"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="909">
     <Window.DataContext>
         <vms:ViewModel/>
     </Window.DataContext>
     <Window.Resources>
+        <vms:ViewModel x:Key="ViewModel"/>
+
+        <Style TargetType="DataGrid">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="38"/>
+            <Setter Property="RowBackground" Value="Transparent"/>
+
+
+        </Style>
+
         <Style TargetType="Button">
             <Setter Property="Background" Value="#007ACC"/>
             <Setter Property="Foreground" Value="White"/>
@@ -44,12 +57,9 @@
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions >
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="300" />
+            <ColumnDefinition Width="210" />
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Row="0" Orientation="Horizontal">
-            <Button Margin="6" Background="#37b33d" Command="{Binding AddItemCommand}">N*10</Button>
-            <Button Margin="6" Background="Crimson"  Command="{Binding RemoveItemCommand}">N/10</Button>
-            <Button Margin="6" Command="{Binding UpdateItemCommand}">Update</Button>
             <Label Foreground="White" Content="{Binding Series2Values}" Width="424" Grid.Row="0" FontSize="15" FontWeight="Bold" />
         </StackPanel>
         <lvc:CartesianChart
@@ -64,8 +74,11 @@
                 </TransformGroup>
             </lvc:CartesianChart.RenderTransform>
         </lvc:CartesianChart>
-
-        <lvc:PieChart Grid.Column="1" Grid.Row="1" Series="{Binding Series2}" />
+        <DataGrid HeadersVisibility="None" Grid.Column="1" Grid.Row="1"
+          dataGrid2D:ItemsSource.Array2D="{Binding _tableData, Source={StaticResource ViewModel}}" />
+        <Label Grid.Column="1" Content="∆" HorizontalAlignment="Left" Margin="10,-10,0,0" VerticalAlignment="Top" Foreground="White" FontSize="40"/>
+        <Label Grid.Column="1" Content="n" HorizontalAlignment="Left" Margin="65,-10,0,0" VerticalAlignment="Center" Foreground="White" FontSize="40"/>
+        <Label Grid.Column="1" Content="w" HorizontalAlignment="Left" Margin="115,-10,0,0" VerticalAlignment="Top" Foreground="White" FontSize="40"/>
     </Grid>
 
 </Window>
